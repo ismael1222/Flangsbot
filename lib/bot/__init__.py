@@ -6,7 +6,7 @@ OWNER_IDS = [546542419399802884]
 
 
 class Bot(BotBase):
-    def __ini__(self):
+    def __init__(self):
         self.PREFIX = PREFIX
         self.ready = False
         self.guild = None
@@ -17,18 +17,18 @@ class Bot(BotBase):
     def run(self, version):
         self.VERSION = version
 
-        with open("./lib/bot/token.0", "r" encoding="utf-8") as tf:
+        with open("./lib/bot/token.0", "r", encoding="utf-8") as tf:
             self.TOKEN = tf.read()
 
-        print("Running Bot ....")
+        print("Running setup ....")
         print("----------")
         super().run(self.TOKEN, reconnect=True)
 
-    async def on_connect():
-        print('Flangsbot is online.')
-        print('----------')
+	async def on_connect(self):
+		print("Flangsbot is online")
+        print("----------")
 
-    async def on_disconnect():
+    async def on_disconnect(self):
         print("Flangsbot is offline")
         print("----------")
 
@@ -37,14 +37,12 @@ class Bot(BotBase):
             self.ready = True
             self.guild = self.get_guild(651231834356711427)
             print("Flangsbot Ready")
-            print('Logged in as ->', self.client.user)
-            print('ID', self.client.user.id)
             print('----------')
         else:
             print("Flngsbot reconnected")
             print("----------")
 
-    async def on_message(sewlf, message):
+    async def on_message(self, message):
         pass
 
 
