@@ -2,4 +2,4 @@
 *.db-journal
 *.vscode
 __pycache__
-"lib/bot/token.0"
+lib/bot/token.0
