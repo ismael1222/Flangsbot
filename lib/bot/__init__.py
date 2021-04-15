@@ -29,7 +29,7 @@ class Bot(BotBase):
     def run(self, VERSION):
         self.VERSION = VERSION
 
-        with open("./lib/bot/token.0", "r", encoding="utf-8") as tf:
+        with open("./lib/bot/token.txt", "r", encoding="utf-8") as tf:
             self.TOKEN = tf.read()
         
         print("Loading Flangsbot")
