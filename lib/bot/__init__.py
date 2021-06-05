@@ -3,7 +3,7 @@ from datetime import datetime
 from glob import glob
 from os import path
 
-from discord.ext.commands import CommandNotFound
+from discord.ext.commands import CommandNotFound, Context
 from discord.ext.commands import Bot as BotBase
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -26,7 +26,7 @@ class Ready(object):
 
     def ready_up(self, cog):
         setattr(self, cog, True)
-        print(f" {cog} cog ready") 
+        print(f"[INFORMATION] [{datetime.utcnow()}] >> ![{cog}] Cog Ready") 
     
     def all_ready(self):
         return all([getattr(self, cog) for cog in COGS])
@@ -45,48 +45,51 @@ class Bot(BotBase):
     def setup(self):
         for cog in COGS:
             self.load_extension(f"lib.cogs.{cog}")
-            print(f" {cog} Cog loaded!")
+            print(f"[INFO] [{datetime.utcnow()}] >> !- [{cog}] COG LOADED")
 
-        print("Setup complete")
+        print(f"[INFO] [{datetime.utcnow()}] >> !- SETUP COMPLETE")
 
     def run(self, VERSION):
         self.VERSION = VERSION
 
-        print("Running Setup ....")
+        print(f"[INFO] [{datetime.utcnow()}] >> !- RUNNING SETUP")
         self.setup()
 
         with open("./lib/bot/token.txt", "r", encoding="utf-8") as tf:
             self.TOKEN = tf.read()
 
-        print("Loading Flangsbot")
-        print("----------")
+        print(f"[INFO] [{datetime.utcnow()}] >> !- Loading Flangsbot")
+
         super().run(self.TOKEN, reconnect=True)
 
+    async def process_commands(self, message):
+        ctx = await self.get_context(message, cls=Context)
+        if ctx.command is not None and ctx.guild is not None:
+            if self.ready:
+                await self.invoke(ctx)
+            else:
+                await ctx.send("!- I'm not ready to recive commands. Please wait a few seconds.")
+            
+
     async def rules_reminder(self):
-        await self.stdout.send("Remember to adhere to the rules!")
+        await self.stdout.send("!- ¡Remember to adhere to the rules!")
 
     async def on_connect(self):
-        print("Connected")
-        print("----------")
+        print(f"[INFO] [{datetime.utcnow()}] >> !~ CONNECTED")
 
     async def on_disconnect(self):
-        print("Disconnected")
-        print("----------")
+        print(f"[INFO] [{datetime.utcnow()}] >> !~ DISCONNECTED")
 
     async def on_error(self, err, *args, **kwargs):
         if err == "on_command_error":
-            await args[0].send("Something went worng.")
+            await args[0].send("!~ Se produjo un error inesperado 0x000100.")
             
-        await self.stdout.send("Se produjo un error inesperado 0x000404.")
-        #raise
+        await self.stdout.send("!~ Se produjo un error inesperado 0x000404.")
+        raise
 
     async def on_command_error(self, ctx, exc):
         if isinstance(exc, CommandNotFound):
             pass
-
-        elif hasattr(exc, "original"):
-            raise exc.original
-
         else:
             raise exc
 
@@ -99,28 +102,23 @@ class Bot(BotBase):
             self.scheduler.add_job(self.rules_reminder, CronTrigger(day_of_week=0, hour=12, minute=0, second=0))
             self.scheduler.start()
 
-            print("Flangscom is ready")
-            print("----------")
+            print(f"[INFO] [{datetime.utcnow()}] >> !- Flangsbot is ready!")
 
-            await self.stdout.send("Flangscom is ready")
-
-            #embed = Embed(title="Running bot", description="Flangsbot is now online", color=0xe17856, timestamp=datetime.utcnow())
-            #fields = [("Name", "Value", True), ("another field", "this field is next to the other one.",True), ("A non-inline field", "this field will appear on it's own row", False)]
-            #for name, value, inline in fields:
-            #    embed.add_field(name=name, value=value, inline=inline)
-            #embed.set_author(name="Flan", icon_url=self.guild.icon_url)
-            #embed.set_footer(text="This is a footer!")
-            #await self.stdout.send(embed=embed)
-            #await self.stdout.send(file=File("./data/images/profile.png"))
+            embed=Embed(title="🤖 Estoy Activo ❗", url="https://discord.com/channels/651231834356711427/850494763160567858", description="Si encuentras algún tipo de error o bug, reportalo en el canal de ", color=0xca5624, timestamp=datetime.utcnow())
+            embed.set_author(name="Flangsbot", url="https://flangscom.herokuapp.com", icon_url=self.guild.icon_url)
+            embed.set_footer(text="by Flangscom team")
+            await self.stdout.send(embed=embed)
+            await self.stdout.send(file=File("./data/images/profile.png"))
 
             while not self.cogs_ready.all_ready():
                 await sleep(0.5)
 
         else:
-            print("Bot Reconnected")
+            print(f"[WARN] [{datetime.utcnow()}] >> !- RECONNECTED")
 
     async def on_message(self, message):
-        pass
+        if not message.author.bot:
+            await self.process_commands(message)
 
 
 Bot = Bot()
