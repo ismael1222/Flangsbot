@@ -2,22 +2,25 @@ from asyncio.tasks import sleep
 from datetime import datetime
 from glob import glob
 from os import path
+import platform
 
-from discord.ext.commands import CommandNotFound, Context
-from discord.ext.commands import Bot as BotBase
-from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 from discord import Embed, File
+from discord.errors import Forbidden, HTTPException
+from discord.ext.commands import Bot as BotBase
+from discord.ext.commands import Context
+from discord.ext.commands.errors import (BadArgument, CommandNotFound, MissingRequiredArgument)
 
 from ..db import db
 
-import platform
 print(platform.python_version())
 
 
 PREFIX = "$"
 OWNER_IDS = ['546542419399802884']
 COGS = [path.split("\\")[-1][:-3] for path in glob("./lib/cogs/*.py")]
+IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
 
 class Ready(object):
     def __init__(self):
@@ -88,10 +91,16 @@ class Bot(BotBase):
         raise
 
     async def on_command_error(self, ctx, exc):
-        if isinstance(exc, CommandNotFound):
+        if any([isinstance(exc, error) for error in IGNORE_EXCEPTIONS]):
             pass
+        elif isinstance(exc, MissingRequiredArgument):
+            await ctx.send("Faltan uno o mas argumentos necesarios requeridos")
+        elif isinstance(exc, HTTPException):
+            await ctx.send("!~ ¡No se pudo enviar el mensaje!")
+        elif isinstance(exc, Forbidden):
+            await ctx.send("!~ ¡No tengo permisos para hacer esto!")
         else:
-            raise exc
+            raise exc.original
 
     async def on_ready(self):
         if not self.ready:
@@ -107,8 +116,8 @@ class Bot(BotBase):
             embed=Embed(title="🤖 Estoy Activo ❗", url="https://discord.com/channels/651231834356711427/850494763160567858", description="Si encuentras algún tipo de error o bug, reportalo en el canal de ", color=0xca5624, timestamp=datetime.utcnow())
             embed.set_author(name="Flangsbot", url="https://flangscom.herokuapp.com", icon_url=self.guild.icon_url)
             embed.set_footer(text="by Flangscom team")
+            embed.set_thumbnail(url=self.guild.icon_url)
             await self.stdout.send(embed=embed)
-            await self.stdout.send(file=File("./data/images/profile.png"))
 
             while not self.cogs_ready.all_ready():
                 await sleep(0.5)
