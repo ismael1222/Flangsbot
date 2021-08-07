@@ -1,0 +1,6 @@
+{
+    "es_ar": "Español Argentina",
+    "FATAL_ERROR":"Ha ocurrido un error fatal",
+    "MissingRequiredArgument":"No existe el argumento requerido.", 
+    "MissingPermissions":"No tienes permitido hacer esto." 
+}

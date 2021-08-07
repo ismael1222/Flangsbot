@@ -1,7 +1,7 @@
 from discord.ext.commands import command, Cog
 from discord.ext.commands.core import has_permissions
 from discord.ext.commands.errors import MissingPermissions, MissingRequiredArgument
-from discord import Embed, permissions
+from discord import Embed
 
 
 class Manager(Cog):
@@ -27,7 +27,9 @@ class Manager(Cog):
             await ctx.send(f"{ctx.author.mention} No tienes los permisos necesarios.")
 
     @Cog.listener()
-    async def 
+    async def on_ready(self):
+        if not self.bot.ready:
+            self.bot.cogs_ready.reday_up("manager")
 
 def setup(bot):
     bot.add_cog(Manager(bot))
