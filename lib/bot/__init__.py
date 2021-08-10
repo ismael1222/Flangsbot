@@ -8,9 +8,10 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from discord import Embed, File
 from discord.errors import Forbidden, HTTPException
-from discord.ext.commands import Bot as BotBase
+from discord.ext.commands import Bot as BotBase, bot
 from discord.ext.commands import Context
 from discord.ext.commands.errors import (BadArgument, CommandNotFound, MissingRequiredArgument)
+from discord_components import DiscordComponents, Button, Select, SelectOption
 
 from ..db import db
 
@@ -24,7 +25,8 @@ IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
 
 class Ready(object):
     def __init__(self):
-       for cog in COGS:
+        
+        for cog in COGS:
            setattr(self, cog, False)
 
     def ready_up(self, cog):
@@ -110,6 +112,7 @@ class Bot(BotBase):
             self.stdout = self.get_channel(845523083700076544)
             self.scheduler.add_job(self.rules_reminder, CronTrigger(day_of_week=0, hour=12, minute=0, second=0))
             self.scheduler.start()
+            DiscordComponents(Bot)
 
             print(f"[INFO] [{datetime.utcnow()}] >> !- Flangsbot is ready!")
 
@@ -131,3 +134,4 @@ class Bot(BotBase):
 
 
 Bot = Bot()
+Bot.remove_command('help')
