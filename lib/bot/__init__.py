@@ -1,21 +1,20 @@
 from asyncio.tasks import sleep
 from datetime import datetime
 from glob import glob
-from os import path
 import platform
 
+from ..db import db
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
-from discord import Embed, File
+from cogwatch import watch
+from discord import Embed
 from discord.errors import Forbidden, HTTPException
-from discord.ext.commands import Bot as BotBase, bot
-from discord.ext.commands import Context
-from discord.ext.commands.errors import (BadArgument, CommandNotFound, MissingRequiredArgument)
-from discord_components import DiscordComponents, Button, Select, SelectOption
+from discord.ext.commands import Bot as BotBase
+from discord.ext.commands.errors import BadArgument, CommandNotFound, MissingRequiredArgument
+from discord.ext.commands.context import Context
+from discord_components import DiscordComponents
 
-from ..db import db
-
-print(platform.python_version())
+print(f"[ENVIRONMENT] Python Enviroment >> {platform.python_version()}")
 
 
 PREFIX = "$"
@@ -58,10 +57,12 @@ class Bot(BotBase):
         self.VERSION = VERSION
 
         print(f"[INFO] [{datetime.utcnow()}] >> !- RUNNING SETUP")
+        print(f"[ENVIROMENT] Version >> {self.VERSION}")
+
         self.setup()
 
-        with open("./lib/bot/token.txt", "r", encoding="utf-8") as tf:
-            self.TOKEN = tf.read()
+        with open("lib/bot/token.txt", "r", encoding="utf-8") as bt:
+            self.TOKEN = bt.read()
 
         print(f"[INFO] [{datetime.utcnow()}] >> !- Loading Flangsbot")
 
@@ -104,12 +105,13 @@ class Bot(BotBase):
         else:
             raise exc.original
 
+    @watch(path='lib/cogs')
     async def on_ready(self):
         if not self.ready:
             self.ready = True
             self.cogs_ready = Ready()
-            self.guild = self.get_guild(651231834356711427)
-            self.stdout = self.get_channel(845523083700076544)
+            self.guild = self.get_guild(651231834356711427) # !
+            self.stdout = self.get_channel(845523083700076544) # !Deprecated
             self.scheduler.add_job(self.rules_reminder, CronTrigger(day_of_week=0, hour=12, minute=0, second=0))
             self.scheduler.start()
             DiscordComponents(Bot)
@@ -134,4 +136,4 @@ class Bot(BotBase):
 
 
 Bot = Bot()
-Bot.remove_command('help')
+Bot.help_command = None

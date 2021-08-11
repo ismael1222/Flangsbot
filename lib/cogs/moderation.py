@@ -4,7 +4,7 @@ from discord.ext.commands.errors import MissingPermissions, MissingRequiredArgum
 from discord import Embed
 
 
-class Manager(Cog):
+class Moderation(Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -32,4 +32,4 @@ class Manager(Cog):
             self.bot.cogs_ready.reday_up("manager")
 
 def setup(bot):
-    bot.add_cog(Manager(bot))
+    bot.add_cog(Moderation(bot))
