@@ -26,10 +26,5 @@ class Moderation(Cog):
         if isinstance(error, MissingPermissions):
             await ctx.send(f"{ctx.author.mention} No tienes los permisos necesarios.")
 
-    @Cog.listener()
-    async def on_ready(self):
-        if not self.bot.ready:
-            self.bot.cogs_ready.reday_up("manager")
-
 def setup(bot):
     bot.add_cog(Moderation(bot))

@@ -17,18 +17,13 @@ class Misc(Cog):
     async def pong(self, ctx):
         await ctx.send(f"Pong!")
 
-#-> Hello
-    @command(name="hello", aliases=["hi"])
-    async def say_hello(self, ctx):
-        await ctx.send(f"{choice(('Hola', 'Hya', 'Hi', 'Helouda', 'Ñe', 'ola', 'ke ase vo', 'ola guap@', 'Buenas'))} {ctx.author.mention}!")
-
 #-> Slap
     @command(name="slap", aliases=["hit"])
     async def slap_member(self, ctx, member: Member, *, reason: Optional[str] = "nada"):
         await ctx.send(f"{ctx.author.display_name} cacheteo a {member.mention} por {reason}❗")
 
     @slap_member.error
-    async def slap_member_error(self, ctx, exc):
+    async def slap_member_error(self, ctx, error, exc):
         if isinstance(exc, BadArgument):
             await exc.send("¡Ese comando no existe!")
 
@@ -41,11 +36,12 @@ class Misc(Cog):
 #-> Latency
     @command(name="lat", aliases=['lms', 'ms'])
     async def latency(self, ctx):
-        await ctx.send(f"⏳ = {round(self.latency * 1000)}ms")
+        # await ctx.send(f"⏳ = {round(self.latency * 1000)}ms")
+        await ctx.send(f"{ctx.author.mention} :red_circle:```Este comando esta temporalmente deshabilitado```")
 
 #-> Eightball
     @command(name="eightball", aliases=['8ball', 'bolaocho','b8'])
-    async def eightball(self, ctx, *, question, error):
+    async def eightball(self, ctx, error, *, question):
         responses = ["Es seguro", "Es decididamente así", "Sin duda", "Puedes confiar en ello", "Tal como lo veo, si", "Lo mas probable", "Si", "Los signos apuntan al si", "Respuesta confusa, intentalo de nuevo", "Vuelve a preguntar mas tarde",
                      "Mejor no te lo digo ahora", "No puedo predecirlo en este momento", "Concentrate y vuelve a preguntar", "Mi respuesta es un no", "Mis fuentes dicen que no", "No cuentes con ello", "Las perspectivas no son tan buenas", "Muy dudoso"]
         embed=Embed(title='**8Ball**', color=0xfff0ff)
@@ -57,7 +53,7 @@ class Misc(Cog):
     @eightball.error
     async def eightball_error(self, ctx, exc, error):
         if isinstance(error, MissingRequiredArgument):
-            await exc.send("!- Se requiere de un ARGUMENTO valido")
+            await ctx.send("!- Se requiere de un ARGUMENTO valido")
 
     @command(name="fact")
     async def objet_fact(self, ctx, object: str):
@@ -76,7 +72,7 @@ class Misc(Cog):
             else:
                 await ctx.send("API returned a {responses.status} status.")
 
-    @command(name="flan", aliases=['flanes', 'flans', 'flangs'])
+    @command(name="flan")
     async def flan(self, ctx):
         flanes = ["http://images7.memedroid.com/images/UPLOADED142/561f3debf00d9.jpeg", "https://cdn.memegenerator.es/imagenes/memes/full/29/73/29733520.jpg"]
         embed=Embed(title="¿Te refieres a esto?", color=0x228acf)            

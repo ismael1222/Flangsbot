@@ -3,15 +3,17 @@ from datetime import datetime
 from glob import glob
 import platform
 
+
 from ..db import db
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from cogwatch import watch
 from discord import Embed
-from discord.errors import Forbidden, HTTPException
+from discord.ext import commands
 from discord.ext.commands import Bot as BotBase
 from discord.ext.commands.errors import BadArgument, CommandNotFound, MissingRequiredArgument
 from discord.ext.commands.context import Context
+from discord.errors import Forbidden, HTTPException
 from discord_components import DiscordComponents
 
 print(f"[ENVIRONMENT] Python Enviroment >> {platform.python_version()}")
@@ -21,6 +23,32 @@ PREFIX = "$"
 OWNER_IDS = ['546542419399802884']
 COGS = [path.split("\\")[-1][:-3] for path in glob("./lib/cogs/*.py")]
 IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
+
+"""Se establece el comportamiento del comando $help <args>"""
+
+class CustomHelpCommand(commands.HelpCommand):
+    def __init__(self):
+        super().__init__()
+
+    async def send_bot_help(self, mapping):
+        for cog in mapping:
+            await self.get_destination().send(f'{cog.qualified_name}: {[command.name for command in mapping[cog]]}')
+
+    async def send_cog_help(self, cog):
+        await self.get_destination().send(f'{cog.quailified_name}: {[command.name for command in cog.get_commands()]}')
+    
+    async def send_group_help(self, group):
+        await self.get_destination().send(f'{group.name}: {[command.name for index, command in enumerate(group.commands)]}')
+
+    async def send_command_help(self, command):
+        await self.get_destination().send(command.name)
+
+class CI():
+    def __init__(self):
+        super().__init__()
+
+    def upgrader(self):
+        pass
 
 class Ready(object):
     def __init__(self):
@@ -35,6 +63,7 @@ class Ready(object):
     def all_ready(self):
         return all([getattr(self, cog) for cog in COGS])
 
+
 class Bot(BotBase):
     def __init__(self):
         self.PREFIX = PREFIX
@@ -44,7 +73,7 @@ class Bot(BotBase):
 
         db.autosave(self.scheduler)
 
-        super().__init__(command_prefix=PREFIX, owner_ids=OWNER_IDS)
+        super().__init__(command_prefix=PREFIX, owner_ids=OWNER_IDS, help_command=CustomHelpCommand())
 
     def setup(self):
         for cog in COGS:
@@ -56,8 +85,8 @@ class Bot(BotBase):
     def run(self, VERSION):
         self.VERSION = VERSION
 
-        print(f"[INFO] [{datetime.utcnow()}] >> !- RUNNING SETUP")
         print(f"[ENVIROMENT] Version >> {self.VERSION}")
+        print(f"[INFO] [{datetime.utcnow()}] >> !- RUNNING SETUP")
 
         self.setup()
 
@@ -74,8 +103,7 @@ class Bot(BotBase):
             if self.ready:
                 await self.invoke(ctx)
             else:
-                await ctx.send("!- I'm not ready to recive commands. Please wait a few seconds.")
-            
+                await ctx.send("!- I'm not ready to recive commands. Please wait a few seconds.")            
 
     async def rules_reminder(self):
         await self.stdout.send("!- ¡Remember to adhere to the rules!")
@@ -110,7 +138,7 @@ class Bot(BotBase):
         if not self.ready:
             self.ready = True
             self.cogs_ready = Ready()
-            self.guild = self.get_guild(651231834356711427) # !
+            self.guild = self.get_guild(651231834356711427) # !Deprecated
             self.stdout = self.get_channel(845523083700076544) # !Deprecated
             self.scheduler.add_job(self.rules_reminder, CronTrigger(day_of_week=0, hour=12, minute=0, second=0))
             self.scheduler.start()
@@ -136,4 +164,3 @@ class Bot(BotBase):
 
 
 Bot = Bot()
-Bot.help_command = None
