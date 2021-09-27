@@ -2,6 +2,10 @@ from asyncio.tasks import sleep
 from datetime import datetime
 from glob import glob
 import platform
+import os
+import discord
+
+from discord.flags import Intents
 
 
 from ..db import db
@@ -23,6 +27,9 @@ PREFIX = "$"
 OWNER_IDS = ['546542419399802884']
 COGS = [path.split("\\")[-1][:-3] for path in glob("./lib/cogs/*.py")]
 IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
+
+intents = discord.Intents.default()
+intents.members = True
 
 """Se establece el comportamiento del comando $help <args>"""
 
@@ -73,7 +80,7 @@ class Bot(BotBase):
 
         db.autosave(self.scheduler)
 
-        super().__init__(command_prefix=PREFIX, owner_ids=OWNER_IDS, help_command=CustomHelpCommand())
+        super().__init__(command_prefix=PREFIX, owner_ids=OWNER_IDS, help_command=CustomHelpCommand(), intents=intents)
 
     def setup(self):
         for cog in COGS:
@@ -90,8 +97,9 @@ class Bot(BotBase):
 
         self.setup()
 
-        with open("lib/bot/token.txt", "r", encoding="utf-8") as bt:
-            self.TOKEN = bt.read()
+        # with open("lib/bot/token.txt", "r", encoding="utf-8") as bt:
+        #     self.TOKEN = bt.read()
+        self.TOKEN = os.getenv('FLANGSBOT_KEY')
 
         print(f"[INFO] [{datetime.utcnow()}] >> !- Loading Flangsbot")
 
