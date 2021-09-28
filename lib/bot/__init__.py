@@ -1,6 +1,5 @@
 import platform
 import discord
-import os
 
 from asyncio.tasks import sleep
 from datetime import datetime
