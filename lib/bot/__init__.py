@@ -1,12 +1,10 @@
+import platform
+import discord
+import os
+
 from asyncio.tasks import sleep
 from datetime import datetime
 from glob import glob
-import platform
-import os
-import discord
-
-from discord.flags import Intents
-
 
 from ..db import db
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -50,13 +48,6 @@ class CustomHelpCommand(commands.HelpCommand):
     async def send_command_help(self, command):
         await self.get_destination().send(command.name)
 
-class CI():
-    def __init__(self):
-        super().__init__()
-
-    def upgrader(self):
-        pass
-
 class Ready(object):
     def __init__(self):
         
@@ -97,9 +88,9 @@ class Bot(BotBase):
 
         self.setup()
 
-        # with open("lib/bot/token.txt", "r", encoding="utf-8") as bt:
-        #     self.TOKEN = bt.read()
-        self.TOKEN = os.getenv('FLANGSBOT_KEY')
+        with open("lib/bot/token.txt", "r", encoding="utf-8") as bt:
+            self.TOKEN = bt.read()
+        # self.TOKEN = os.getenv('FLANGSBOT_KEY')
 
         print(f"[INFO] [{datetime.utcnow()}] >> !- Loading Flangsbot")
 

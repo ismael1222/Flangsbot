@@ -18,7 +18,7 @@ class Events(Cog):
 
         try:
             await member.send("Bienvenid@")
-            await member.add_roles(id=651235495870988288)
+            await member.add_roles(member.guild.get_role(651235495870988288))
 
         except Forbidden:
             pass
