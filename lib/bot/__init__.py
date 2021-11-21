@@ -88,9 +88,9 @@ class Bot(BotBase):
 
         self.setup()
 
-        with open("lib/bot/token.txt", "r", encoding="utf-8") as bt:
-            self.TOKEN = bt.read()
-        # self.TOKEN = os.getenv('FLANGSBOT_KEY')
+        # with open("lib/bot/token.txt", "r", encoding="utf-8") as bt:
+        #     self.TOKEN = bt.read()
+        self.TOKEN = os.getenv('FLANGSBOT_KEY')
 
         print(f"[INFO] [{datetime.utcnow()}] >> !- Loading Flangsbot")
 
