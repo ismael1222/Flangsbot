@@ -18,13 +18,5 @@ class Moderation(Cog):
         else:
             await ctx.channel.purge(limit=ammount)
 
-    @clear.error
-    async def clear_error(self, ctx, error):
-        if isinstance(error, MissingRequiredArgument):
-            await ctx.send(f"{ctx.author.mention} Especifica la cantidad de mensajes.")
-
-        if isinstance(error, MissingPermissions):
-            await ctx.send(f"{ctx.author.mention} No tienes los permisos necesarios.")
-
 def setup(bot):
     bot.add_cog(Moderation(bot))
