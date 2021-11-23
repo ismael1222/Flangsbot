@@ -13,7 +13,7 @@ from cogwatch import watch
 from discord import Embed
 from discord.ext import commands
 from discord.ext.commands import Bot as BotBase
-from discord.ext.commands.errors import BadArgument, CommandNotFound, MissingRequiredArgument
+from discord.ext.commands.errors import BadArgument, CommandNotFound, MissingPermissions, MissingRequiredArgument
 from discord.ext.commands.context import Context
 from discord.errors import Forbidden, HTTPException
 from discord_components import DiscordComponents
@@ -88,8 +88,6 @@ class Bot(BotBase):
 
         self.setup()
 
-        # with open("lib/bot/token.txt", "r", encoding="utf-8") as bt:
-        #     self.TOKEN = bt.read()
         self.TOKEN = os.getenv('FLANGSBOT_KEY')
 
         print(f"[INFO] [{datetime.utcnow()}] >> !- Loading Flangsbot")
@@ -115,20 +113,29 @@ class Bot(BotBase):
 
     async def on_error(self, err, *args, **kwargs):
         if err == "on_command_error":
-            await args[0].send("!~ Se produjo un error inesperado 0x000100.")
-            
-        await self.stdout.send("!~ Se produjo un error inesperado 0x000404.")
+            # Errno: WCOMMAND
+            await args[0].send(f"!~ Se produjo un error inesperado 0x000100.\n !~ {err}")
+            # 
+        await self.stdout.send(f"!~ Se produjo un error inesperado 0x000404. \n !~ {err}")
         raise
-
+    
+    # Si se va trabajan los cogs con errores independientes, eliminar esto de abajo porque no es enecesario.
     async def on_command_error(self, ctx, exc):
         if any([isinstance(exc, error) for error in IGNORE_EXCEPTIONS]):
-            pass
+            await ctx.send(f"{exc}")
+
         elif isinstance(exc, MissingRequiredArgument):
-            await ctx.send("Faltan uno o mas argumentos necesarios requeridos")
+            await ctx.send(f"{ctx.author.mention} Faltan uno o mas argumentos necesarios requeridos")
+
         elif isinstance(exc, HTTPException):
-            await ctx.send("!~ ¡No se pudo enviar el mensaje!")
+            await ctx.send(f"{ctx.author.mention} ¡No se pudo enviar el mensaje!")
+
         elif isinstance(exc, Forbidden):
-            await ctx.send("!~ ¡No tengo permisos para hacer esto!")
+            await ctx.send(f"{ctx.author.mention} ¡No tengo permisos para hacer esto!")
+
+        elif isinstance(exc, MissingPermissions):
+            await ctx.send(f"{ctx.author.mention} ¡No tienes permisos para hacer esto!")
+
         else:
             raise exc.original
 
