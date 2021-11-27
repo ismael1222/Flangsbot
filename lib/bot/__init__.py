@@ -29,7 +29,6 @@ IGNORE_EXCEPTIONS = (CommandNotFound, BadArgument)
 intents = discord.Intents.default()
 intents.members = True
 
-"""Se establece el comportamiento del comando $help <args>"""
 
 class CustomHelpCommand(commands.HelpCommand):
     def __init__(self):
@@ -56,7 +55,7 @@ class Ready(object):
 
     def ready_up(self, cog):
         setattr(self, cog, True)
-        print(f"[INFORMATION] [{datetime.utcnow()}] >> ![{cog}] Cog Ready") 
+        print(f"[COG] [{datetime.utcnow()}] >> ![{cog}] ~ ready") 
     
     def all_ready(self):
         return all([getattr(self, cog) for cog in COGS])
@@ -76,15 +75,15 @@ class Bot(BotBase):
     def setup(self):
         for cog in COGS:
             self.load_extension(f"lib.cogs.{cog}")
-            print(f"[INFO] [{datetime.utcnow()}] >> !- [{cog}] COG LOADED")
+            print(f"[COG] [{datetime.utcnow()}] >> !- [{cog}] COG LOADED")
 
-        print(f"[INFO] [{datetime.utcnow()}] >> !- SETUP COMPLETE")
+        print(f"[SETUP] [{datetime.utcnow()}] >> !- SETUP COMPLETE")
 
     def run(self, VERSION):
         self.VERSION = VERSION
 
-        print(f"[ENVIROMENT] Version >> {self.VERSION}")
-        print(f"[INFO] [{datetime.utcnow()}] >> !- RUNNING SETUP")
+        print(f"[ENV] Version >> {self.VERSION}")
+        print(f"[SETUP] [{datetime.utcnow()}] >> !- RUNNING SETUP")
 
         self.setup()
 
@@ -106,17 +105,16 @@ class Bot(BotBase):
         await self.stdout.send("!- ¡Remember to adhere to the rules!")
 
     async def on_connect(self):
-        print(f"[INFO] [{datetime.utcnow()}] >> !~ CONNECTED")
+        print(f"[WARN] [{datetime.utcnow()}] >> !~ CONNECTED")
 
     async def on_disconnect(self):
-        print(f"[INFO] [{datetime.utcnow()}] >> !~ DISCONNECTED")
+        print(f"[WARN] [{datetime.utcnow()}] >> !~ DISCONNECTED")
 
     async def on_error(self, err, *args, **kwargs):
         if err == "on_command_error":
             # Errno: WCOMMAND
             await args[0].send(f"!~ Se produjo un error inesperado 0x000100.\n !~ {err}")
-            # 
-        await self.stdout.send(f"!~ Se produjo un error inesperado 0x000404. \n !~ {err}")
+        # await self.stdout.send(f"!~ Se produjo un error inesperado 0x000404. \n !~ {err}")
         raise
     
     # Si se va trabajan los cogs con errores independientes, eliminar esto de abajo porque no es enecesario.
@@ -124,20 +122,15 @@ class Bot(BotBase):
         if any([isinstance(exc, error) for error in IGNORE_EXCEPTIONS]):
             await ctx.send(f"{exc}")
 
-        elif isinstance(exc, MissingRequiredArgument):
-            await ctx.send(f"{ctx.author.mention} Faltan uno o mas argumentos necesarios requeridos")
-
         elif isinstance(exc, HTTPException):
             await ctx.send(f"{ctx.author.mention} ¡No se pudo enviar el mensaje!")
 
         elif isinstance(exc, Forbidden):
             await ctx.send(f"{ctx.author.mention} ¡No tengo permisos para hacer esto!")
 
-        elif isinstance(exc, MissingPermissions):
-            await ctx.send(f"{ctx.author.mention} ¡No tienes permisos para hacer esto!")
-
         else:
-            raise exc.original
+            pass
+            # raise exc.original
 
     @watch(path='lib/cogs')
     async def on_ready(self):
@@ -146,15 +139,23 @@ class Bot(BotBase):
             self.cogs_ready = Ready()
             self.guild = self.get_guild(651231834356711427) # !Deprecated
             self.stdout = self.get_channel(845523083700076544) # !Deprecated
+
             self.scheduler.add_job(self.rules_reminder, CronTrigger(day_of_week=0, hour=12, minute=0, second=0))
             self.scheduler.start()
+            
             DiscordComponents(Bot)
 
             print(f"[INFO] [{datetime.utcnow()}] >> !- Flangsbot is ready!")
 
-            embed=Embed(title="🤖 Estoy Activo ❗", url="https://discord.com/channels/651231834356711427/850494763160567858", description="Si encuentras algún tipo de error o bug, reportalo en el canal de ", color=0xca5624, timestamp=datetime.utcnow())
+            embed=Embed(
+                title=f'***Flangscom Environment***', 
+                url="https://discord.com/channels/651231834356711427/850494763160567858", 
+                description="Para reportar errores puedes hacerlo en el link del titulo del embed.", 
+                color=0xca5624, 
+                timestamp=datetime.utcnow()
+            )
             embed.set_author(name="Flangsbot", url="https://flangscom.herokuapp.com", icon_url=self.guild.icon_url)
-            embed.set_footer(text="by Flangscom team")
+            embed.set_footer(text="by Flangrys#7673 | by Flangscom™", icon_url=self.guild.icon_url)
             embed.set_thumbnail(url=self.guild.icon_url)
             await self.stdout.send(embed=embed)
 
@@ -167,6 +168,5 @@ class Bot(BotBase):
     async def on_message(self, message):
         if not message.author.bot:
             await self.process_commands(message)
-
 
 Bot = Bot()
