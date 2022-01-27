@@ -1,0 +1,10 @@
+{
+    "emojis": {
+        "info": "ℹ️",
+        "warning": "⚠️",
+        "error": "❌",
+        "success": "✅",
+        "question": "❓",
+        "spinner": "⌛️"
+    }
+}

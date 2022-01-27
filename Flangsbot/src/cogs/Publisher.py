@@ -7,7 +7,8 @@ class Publisher(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    #-> Send Embed
+    # Send embed with a info the specific guild
+
     @command(name="info", aliases=['i'])
     async def info(self, ctx):
         embed=Embed(title="Flangsbot", url="http://flangscom.herokuapp.com", color=0xa244d5)
@@ -16,14 +17,25 @@ class Publisher(Cog):
 
         await ctx.send(
             embed=embed,
-            component = [
-                Button(style=ButtonStyle.grey, label="Web Site", emoji="🌐"),
-                Button(style=ButtonStyle.grey, label="Invite")
+            components=[
+                Select(
+                    placeholder = "Opciones",
+                    max_values = '3',
+                    options = [
+                        SelectOption(label = "Dashboard", value = "https://flangscom.herokuapp.com"),
+                        SelectOption(label = "Twitter", value = "https://twitter.com/flangrys_"),
+                        SelectOption(label = "GitHub", value = "https://github.com/flangrys/flangsbot")
+                    ]
+                )
             ]
+            
         )
         while True:
-            interaction = await self.bot.wait_for("button_click")
-            await interaction.respond(content=f"{interaction.component.label} clickeado!")
+            interaction = await self.bot.wait_for("select_option")
+            await interaction.respond(
+                content = f"{','.join(map(lambda x: x.label, interaction.selected_options))} seleccionado",
+            )
+
 
 def setup(bot):
     bot.add_cog(Publisher(bot))

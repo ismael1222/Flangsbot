@@ -1,5 +1,5 @@
-from lib.bot import Bot
+from Flangsbot.src.bot import flan
 
 VERSION = "0.0.7"
 
-Bot.run(VERSION)
+flan.run(VERSION)
