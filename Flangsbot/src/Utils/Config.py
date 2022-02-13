@@ -31,7 +31,3 @@ class Configuration(object):
         with open(path, "r") as f:
             result = Configuration.__load__(json.loads(f.read()))
         return result
-
-    @staticmethod
-    def write_json(data: dict):
-        pass

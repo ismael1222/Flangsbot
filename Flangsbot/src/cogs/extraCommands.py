@@ -1,5 +1,4 @@
 from discord.ext.commands import command, Cog
-from discord.ext.commands.errors import BadArgument, MissingRequiredArgument
 from discord import Embed
 from discord_components import DiscordComponents, Button, ButtonStyle, Select, SelectOption, component, interaction
 

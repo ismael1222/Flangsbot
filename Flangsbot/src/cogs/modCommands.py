@@ -1,3 +1,4 @@
+from email import message
 import discord
 
 from discord.ext.commands import command, Cog
@@ -6,20 +7,17 @@ from discord.ext.commands.errors import MemberNotFound
 from discord.embeds import Embed
 
 class Moderation(Cog):
-    """
-    Moderation Commands        
-    """
     def __init__(self, bot):
         self.bot = bot
 
     @command(name="clear", aliases=["cls"])
     @has_guild_permissions(manage_messages=True)
-    async def clear(self, ctx, amount: int = None):
-        if (amount >= 10):
+    async def clear(self, ctx, amount: int = None, *args):
+        if (amount <= 50):
             await ctx.channel.purge(limit=amount)
-            await ctx.send(f'Se han eliminado {amount} mensajes', delete_after=3)
+            await ctx.send(f'</ {ctx.message.author.mention} /> Se han eliminado {amount} mensajes', delete_after=3)
         else:
-            await ctx.send(f"!Solo puedes borrar 10 mensajes a la vez")
+            await ctx.send(f'</ {ctx.message.author.mention} /> No puedes eliminar más de 50 mensajes', delete_after=3)
             
     @clear.error
     async def clear_error(self, ctx, error):
@@ -32,7 +30,7 @@ class Moderation(Cog):
 
     @command(name="ban")
     @has_guild_permissions(ban_members=True)
-    async def ban(self, ctx, member: discord.Member, *, reason: str):
+    async def ban(self, ctx, member: discord.Member, *reason: str):
         await member.ban(reason=reason)
 
         emb = Embed(title=f'~~Cagatse~~', description=f'{member.mention} ha sido baneado por {ctx.author.mention}', color=0xFFC500)
@@ -56,7 +54,7 @@ class Moderation(Cog):
 
     @command(name='report')
     @has_guild_permissions(ban_members=True)
-    async def report(self, ctx, member: discord.Member, *, reason: str = None):
+    async def report(self, ctx, member: discord.Member, *reason: str):
 
         emb = Embed(title=f'~~**Reporte**~~', description=f'{member.mention} ha sido reportado por {ctx.author.mention}', color=0xFFC500)
         emb.set_thumbnail(url=member.avatar_url)
