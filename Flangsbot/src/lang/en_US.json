@@ -1,0 +1,20 @@
+{
+    "en_US": {
+        "description": "Standard translation en_US package",
+        "version": "1.0.0",
+        "authors": [
+            "@flangrys",
+            "@brais_blob"
+        ]
+    },
+    "std": {
+        "BadArgument": "",
+        "CommandNotFound": "",
+        "Forbidden": "",
+        "HTTPException": "",
+        "MemberNotFound": "",
+        "MissingPermissions": "",
+        "MissingRequiredArgument": "",
+        "MissingRole": ""
+    }
+}

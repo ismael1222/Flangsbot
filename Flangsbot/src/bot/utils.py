@@ -1,5 +1,8 @@
-import json
+from typing import Any
 
+from discord.embeds import Embed
+
+import json
 
 class Dict(dict):
     """dot.notation access to dictionary attributes"""
@@ -31,3 +34,10 @@ class Configuration(object):
         with open(path, "r") as f:
             result = Configuration.__load__(json.loads(f.read()))
         return result
+
+# async def get_embed(file) -> Any:
+#     async with open(file, "r") as f:
+#         embed = Embed.from_dict(
+#             json.loads(f)
+#         )
+#         return embed

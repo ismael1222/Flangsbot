@@ -8,6 +8,7 @@ from discord_components import Button, ButtonStyle, Select, SelectOption, compon
 from aiohttp import request
 from random import choice, random
 
+#TODO: Refactor all of this code
 class Misc(Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -36,7 +37,6 @@ class Misc(Cog):
     @command(name="lat", aliases=['lms', 'ms'])
     async def latency(self, ctx):
         await ctx.send(f"⏳ = {round(self.latency * 1000)}ms")
-        # await ctx.send(f"{ctx.author.mention} :red_circle:```Este comando esta temporalmente deshabilitado```")
 
 #-> Eightball
     @command(name="eightball", aliases=['8ball', 'bolaocho','b8'])
@@ -64,7 +64,7 @@ class Misc(Cog):
 
                 embed=Embed(title="💡 Facts ", url="https://some-random-api.ml", color=0x228acf)
                 embed.set_thumbnail(url=data["image"])
-                embed.add_field(name="***Respuesta***", value="{}".format(data["caption"]), inline=True)
+                embed.add_field(name="***Respuesta***", value=f'{data["caption"]}', inline=True)
                 embed.set_footer(text="Nobody!")
                 await ctx.send(embed=embed)
 

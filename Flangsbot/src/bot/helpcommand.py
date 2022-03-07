@@ -9,7 +9,7 @@ class CustomHelpCommand(HelpCommand):
             await self.get_destination().send(f'{cog.qualified_name}: {[command.name for command in mapping[cog]]}')
 
     async def send_cog_help(self, cog):
-        await self.get_destination().send(f'{cog.quailified_name}: {[command.name for command in cog.get_commands()]}')
+        await self.get_destination().send(f'{cog.qualified_name}: {[command.name for command in cog.get_commands()]}')
     
     async def send_group_help(self, group):
         await self.get_destination().send(f'{group.name}: {[command.name for index, command in enumerate(group.commands)]}')

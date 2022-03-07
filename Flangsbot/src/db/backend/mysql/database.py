@@ -12,7 +12,7 @@ async def create_mysql(
         host=host, port=port, user=user, password=password, db=dbname, autocommit=True
     )
 
-class SqlDatabase(Database):
+class MySqlDatabase(Database):
     def __str__(self):
         return f'{self.__class__.__name__}'
 
@@ -22,7 +22,7 @@ class SqlDatabase(Database):
         self.cursor_context = SQL_TYPE[type(database)]['cursorcontext']
         self.commit_needed = SQL_TYPE[type(database)]['commit']
         self.quotes = SQL_TYPE[type(database)]['quotes']
-        self.pool =  SQL_TYPE[type(database)]['pool']
+        self.pool = SQL_TYPE[type(database)]['pool']
     
     def with_commit(func):
         async def inner(self, *args, **kargs):
@@ -53,12 +53,15 @@ class SqlDatabase(Database):
 
         return inner
 
+
     async def commit(self):
         if not self.pool:
             await self.database.commit()
 
+
     async def close(self):
         await self.database.close()
+
 
     async def insertifnotexists(self, table_name, data, checks):
         response = await self.select(table_name, [], checks, True)
@@ -66,11 +69,13 @@ class SqlDatabase(Database):
         if not response:
             return await self.insert(table_name, data)
 
+
     @with_cursor
     @with_commit
     async def insert(self, cursor, table_name, data):
         query = f"INSERT INTO {table_name} ({', '.join(data.keys())}) VALUES ({', '.join([self.place_holder] * len(data.values()))})"
         await cursor.execute(query, list(data.values()))
+
 
     @with_cursor
     @with_commit
@@ -85,6 +90,7 @@ class SqlDatabase(Database):
 
         query += "\n);"
         await cursor.execute(query)
+
 
     @with_cursor
     @with_commit
@@ -105,6 +111,7 @@ class SqlDatabase(Database):
 
         await cursor.execute(query, list(data.values()) + list(checks.values()))
 
+
     async def updateorinsert(self, table_name, data, checks, insert_data):
         response = await self.select(table_name, [], checks, True)
 
@@ -112,6 +119,7 @@ class SqlDatabase(Database):
             return await self.update(table_name, data, checks)
 
         return await self.insert(table_name, insert_data)
+
 
     @with_cursor
     @with_commit
@@ -128,6 +136,7 @@ class SqlDatabase(Database):
             query = query[:-4]
 
         await cursor.execute(query, list(checks.values()))
+
 
     @with_cursor
     async def select(self, cursor, table_name, keys, checks=None, fetchall=False):
@@ -156,6 +165,7 @@ class SqlDatabase(Database):
             else dict(zip(columns, result))
         )
 
+
     @with_cursor
     @with_commit
     async def execute(
@@ -182,7 +192,7 @@ class SqlDatabase(Database):
 SQL_TYPE: Dict[Any, Dict[str, Any]] = {
 
     aiomysql.pool.Pool: {
-        "class": SqlDatabase,
+        "class": MySqlDatabase,
         "placeholder": "%s",
         "cursorcontext": True,
         "commit": True,

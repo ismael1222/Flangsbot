@@ -2,8 +2,6 @@ import os
 import platform
 import logging as log
 
-from glob import glob
-
 from asyncio.tasks import sleep
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -11,17 +9,16 @@ from apscheduler.triggers.cron import CronTrigger
 
 from cogwatch import watch
 
-import discord
-from discord import Embed
-from discord.ext.commands import Bot as BotBase
+from discord import Embed, Intents, Game
 from discord.ext.commands.context import Context
+from discord.ext.commands import Bot as BotBase
 from discord.errors import Forbidden, HTTPException
 from discord_components import DiscordComponents
 
-
-from .config import PREFIX, LOGGIN_FORMAT, OWNER_IDS, COGS_DIR, IGNORE_EXCEPTIONS
+from .config import PREFIX, LOGGIN_FORMAT, OWNER_IDS, COGS, IGNORE_EXCEPTIONS
 from .helpcommand import Help
 from .preloader import Preload
+from .utils import Configuration
 
 log.basicConfig(
     format=LOGGIN_FORMAT, 
@@ -30,9 +27,7 @@ log.basicConfig(
 
 log.debug(f'Python Enviroment Version:{platform.python_version()}')
 
-COGS = [path.split("\\")[-1][:-3] for path in glob(COGS_DIR)]
-
-intents = discord.Intents.default()
+intents = Intents.default()
 intents.members = True
 
 class Bot(BotBase):
@@ -81,13 +76,14 @@ class Bot(BotBase):
                 #TODO: Fix context void
                 await ctx.send("!- I'm not ready to recive commands. Please wait a few seconds.")
 
-    @watch(path='Flangsbot/src/cogs')
+    @watch(path = "Flangsbot/src/cogs/")
     async def on_ready(self):
         if not self.ready:
             self.ready = True
             self.preload = Preload()
             self.ch = self.get_channel(845523083700076544)
             self.guild = self.get_guild(651231834356711427) # !Deprecated
+            
             DiscordComponents(Bot)
             
             log.info(f'>>> FLANGSBOT READY')
@@ -95,12 +91,11 @@ class Bot(BotBase):
             embd2=Embed(
                 title='***Flangscom Environment***',
                 url="https://discord.com/channels/910550055226863656/911320937712975932", 
-                description="Para reportar errores puedes hacerlo en el link del titulo del embed.", 
+                description="", 
                 color=0xca5624
             )
             embd2.set_author(name="Flangsbot", url="https://flangscom.herokuapp.com", icon_url=self.guild.icon_url)
-            embd2.set_footer(text="by Flangrys#7673 | by Flangscom™", icon_url=self.guild.icon_url)
-            embd2.set_thumbnail(url=self.guild.icon_url)
+            embd2.set_footer(text="Developed by Flangscom™ | Flangrys#7673", icon_url=self.guild.icon_url)
 
             await self.ch.send(embed=embd2)
 
@@ -123,12 +118,10 @@ class Bot(BotBase):
 
     async def on_error(self, err, *args, **kwargs):
         if err == "on_command_error":
-            # Errno: WORNG_COMMAND
-            await args[0].send(f"!~ Se produjo un error inesperado 0x000100.\n !~ {err}")
-        # Errono: UNKNOW_COMMAND
-        await self.get_channel(845523083700076544).send(f"!~ Se produjo un error inesperado 0x000404.\n !~ {err}")
+            await args[0].send(f"Se produjo un error en el comando: {err} \n [0x000100]")
+        await self.get_channel(845523083700076544).send(f"Se produjo un error inesperado: {err} \n [0x000404]")
         raise
-
+    
     async def on_command_error(self, ctx, exc):
         if any([isinstance(exc, error) for error in IGNORE_EXCEPTIONS]):
             await ctx.send(f"{exc}")
@@ -139,7 +132,7 @@ class Bot(BotBase):
         elif isinstance(exc, Forbidden):
             await ctx.send(f"{ctx.author.mention} ¡No tengo permisos para hacer esto!")
 
-        else:
+        else: #NOTE: This is the default error handler, but can overlap with the cogs command error.
             embd1 = Embed(
                 title="***¡Boo boo!***",
                 url="https://flangscom.herokuapp.com",
@@ -147,7 +140,7 @@ class Bot(BotBase):
                 color=0xca5624
             )
             embd1.add_field(
-                name="Administrador:", value='<@!546542419399802884>', inline=True
+                name="Administrador", value='<@!546542419399802884>', inline=True
             )
             embd1.add_field(
                 name=f'Exception Raised', value=f'{exc}', inline=True

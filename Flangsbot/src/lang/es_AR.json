@@ -1,0 +1,20 @@
+{
+    "es_AR": {
+        "description": "Paquete de traduccion estandar es_AR",
+        "version": "1.0.0",
+        "authors": [
+            "@flangrys",
+            "@brais_blob"
+        ]
+    },
+    "std": {
+        "BadArgument": "El argumento ingresado es invalido",
+        "CommandNotFound": "No se encontro el comando",
+        "Forbidden": "No tengo permisos para esto",
+        "HTTPException": "Boo Boo, algo salio mal",
+        "MemberNotFound": "Creo que 'tas pirado",
+        "MissingPermissions": "Permiso denegado",
+        "MissingRequiredArgument": "Falta uno o mas argumentos requeridos",
+        "MissingRole": "No tienes el rol necesario"
+    }
+}

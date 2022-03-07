@@ -1,4 +1,16 @@
 {
     "python.pythonPath": "C:\\Python39\\python.exe",
-    "cmake.configureOnOpen": true
+    "cmake.configureOnOpen": true,
+    "python.testing.pytestArgs": [
+        "Flangsbot"
+    ],
+    "python.testing.unittestEnabled": true,
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        ".",
+        "-p",
+        "test_*.py"
+    ]
 }

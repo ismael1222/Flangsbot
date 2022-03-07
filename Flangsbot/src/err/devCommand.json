@@ -1,0 +1,15 @@
+{
+    "content": "Hmm...",
+    "embed": {
+        "title": "**Command in progress...**",
+        "description": "This command is currently in development. Please check back later.",
+        "url": "http://flangscom.herokuapp.com",
+        "color": "7971106",
+        "fields": [
+            {
+                "name": "**Developer",
+                "value": "Flangrys#7673"
+            }
+        ]
+    }
+}
