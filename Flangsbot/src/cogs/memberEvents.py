@@ -1,51 +1,46 @@
 from typing import Dict
+from aiosqlite import connect
 
-from discord.ext.commands import Cog
+from discord.ext.commands import Cog, Bot
 from discord.embeds import Embed
 from discord.member import Member
 
+from Flangsbot.src.db.models.Guild import GuildTable
+
 class WelcomeActions(Cog):
     def __init__(self, bot):
-        self.bot = bot
-        #FIX: Change this for a database model.
-        self.welcome_channels: Dict[int, int] = {
-            651231834356711427: 722299537460559873, #Flangscom
-            804500094686330912: 805180994117697557, #Survivaland
-        }
+        self.bot: Bot = bot
 
+#FIX: RuntimeWarning: coroutine 'SqliteDatabase.with_cursor.<locals>.inner' was never awaited.
+#TODO: Create a system that will send custom welcome message to the user from database.
     @Cog.listener()
     async def on_member_join(self, member: Member):
-        #TODO: Make a module that checks if the guild has in the database. 
-        # If the guild isn't in the database, it will create a new table. 
-        # If the guild it's in the database, it will return the default welcome channel.
-
-        guild = member.guild
+        conn = await connect('Flangsbot/src/db/database.db')
         guild_id = member.guild.id
 
-        #FIX: Change this for a database model.
+        GuildT_ = GuildTable(conn, guild_id)
+
+        result: Dict[str, int] = await GuildT_.select(
+            keys = "welcome_channel_id"
+        )
+
         channel = self.bot.get_channel(
-            self.welcome_channels[guild_id]
+            result["welcome_channel_id"]
         )
 
-        embed = Embed(
-            title = "Welcome to the server!",
-            description = "Welcome to {} {}".format(guild.name, member.mention),
-            color = 0x00ff00
-        )
-
-        await channel.send(embed)
-
-        #NOTE: Givear desde la base de datos el canal de bienvenida segun el guild.
-        #NOTE: Si el guild donde ingreso el usuario no tiene un canal de bienvenida por defecto configurado, raisear un error.
+        await channel.send(f'{member.mention} has joined the server!')
 
     @Cog.listener()
     async def on_member_remove(self, member: Member):
-        guild = member.guild
+        conn = await connect('Flangsbot/src/db/database.db')
         guild_id = member.guild.id
 
-        #FIX: Change this for a database model.
+        result: Dict[str, int] = await GuildTable(conn, guild_id).select(
+            keys = "welcome_channel_id"
+        )
+
         channel = self.bot.get_channel(
-            self.welcome_channels[guild_id]
+            result["welcome_channel_id"]
         )
 
         await channel.send(f"{member.mention} has left the server.")

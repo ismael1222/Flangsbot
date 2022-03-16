@@ -1,5 +1,5 @@
 from Flangsbot.src.bot import flan
 
-VERSION = "0.0.7"
+VERSION = "0.1.1"
 
 flan.run(VERSION)

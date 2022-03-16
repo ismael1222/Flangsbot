@@ -21,7 +21,7 @@ class MySqlDatabase(Database):
         self.place_holder = SQL_TYPE[type(database)]['placeholder']
         self.cursor_context = SQL_TYPE[type(database)]['cursorcontext']
         self.commit_needed = SQL_TYPE[type(database)]['commit']
-        self.quotes = SQL_TYPE[type(database)]['quotes']
+        self.quote = SQL_TYPE[type(database)]['quotes']
         self.pool = SQL_TYPE[type(database)]['pool']
     
     def with_commit(func):

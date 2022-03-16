@@ -13,7 +13,7 @@ class SqliteDatabase(Database):
         self.place_holder = SQLITE_TYPE[type(database)]['placeholder']
         self.cursor_context = SQLITE_TYPE[type(database)]['cursorcontext']
         self.commit_needed = SQLITE_TYPE[type(database)]['commit']
-        self.quotes = SQLITE_TYPE[type(database)]['quotes']
+        self.quote = SQLITE_TYPE[type(database)]['quotes']
         self.pool = SQLITE_TYPE[type(database)]['pool']
 
     def with_commit(func):
@@ -74,6 +74,13 @@ class SqliteDatabase(Database):
         await cursor.execute(query, list(data.values()) + list(checks.values()))
 
 
+    @with_cursor
+    @with_commit
+    async def insert(self, cursor, table_name, data):
+        query = f"INSERT INTO {table_name} ({', '.join(data.keys())}) VALUES ({', '.join([self.place_holder] * len(data.values()))})"
+        await cursor.execute(query, list(data.values()))
+
+
     async def updateorinsert(self, table_name, data, checks, insert_data):
         response = await self.select(table_name, [], checks, True)
 
@@ -82,12 +89,6 @@ class SqliteDatabase(Database):
 
         return await self.insert(table_name, insert_data)
 
-
-    @with_cursor
-    @with_commit
-    async def insert(self, cursor, table_name, data):
-        query = f"INSERT INTO {table_name} ({', '.join(data.keys())}) VALUES ({', '.join([self.place_holder] * len(data.values()))})"
-        await cursor.execute(query, list(data.values()))
 
     async def insertifnotexists(self, table_name, data, checks):
         response = await self.select(table_name, [], checks, True)
@@ -113,7 +114,13 @@ class SqliteDatabase(Database):
 
     @with_cursor
     @with_commit
-    async def create_table(self, cursor, table_name, columns=None, not_exists=False):
+    async def create_table(
+        self, 
+        cursor, 
+        table_name, 
+        columns=None, 
+        not_exists=False
+    ):
         query = f'CREATE TABLE {"IF NOT EXISTS" if not_exists else ""} {self.quote}{table_name}{self.quote} ('
         columns = [] if columns is None else columns
 
@@ -128,7 +135,7 @@ class SqliteDatabase(Database):
 
     @with_cursor
     @with_commit
-    async def execute(self, cursor, sql, values: List[Any] = None):
+    async def execute(self, cursor, sql: str, values: List[Any] | None):
         await cursor.execute(sql, values if values is not None else [])
 
         result = await cursor.fetchall()
@@ -143,10 +150,17 @@ class SqliteDatabase(Database):
 
 
     @with_cursor
-    async def select(self, cursor, table_name, keys, checks=None, fetchall=False):
+    async def select(
+        self, 
+        cursor, 
+        table_name: str, 
+        keys: List[str],
+        checks: List[Any] = None,
+        fetchall: bool = False
+    ):
         checks = {} if checks is None else checks
-
         keys = "*" if not keys else keys
+
         query = f"SELECT {','.join(keys)} FROM {table_name} "
 
         if checks:

@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, List, Union, Optional, Any
 
 class UnsupportedDatabase(Exception): ...
+class UnstablishedDatabaseConnection(Exception): ...
 
 class BaseDatabase(ABC):
     __slots__ = ("database",)

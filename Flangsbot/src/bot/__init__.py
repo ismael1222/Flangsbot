@@ -15,14 +15,17 @@ from discord.ext.commands import Bot as BotBase
 from discord.errors import Forbidden, HTTPException
 from discord_components import DiscordComponents
 
-from .config import PREFIX, LOGGIN_FORMAT, OWNER_IDS, COGS, IGNORE_EXCEPTIONS
+from .config import FMT, PREFIX, OWNER_IDS, COGS, IGNORE_EXCEPTIONS, STD_HANDLER
 from .helpcommand import Help
 from .preloader import Preload
 from .utils import Configuration
 
+# log = logging.getLogger(__name__)
+# log.addHandler(STD_HANDLER)
+
 log.basicConfig(
-    format=LOGGIN_FORMAT, 
-    level=log.DEBUG
+    level=log.INFO,
+    format=FMT
 )
 
 log.debug(f'Python Enviroment Version:{platform.python_version()}')
@@ -52,7 +55,7 @@ class Bot(BotBase):
 
     def run(self, VERSION):
         self.VERSION = VERSION
-        self.TOKEN = os.getenv('FLANGSBOT_KEY')
+        self.TOKEN = os.getenv('FLANGSBOT_TOKEN')
 
         log.info(f'Flangsbot Development Version: {self.VERSION}')
         log.warn(f'!> RUNNING SETUP')
@@ -84,6 +87,7 @@ class Bot(BotBase):
             self.ch = self.get_channel(845523083700076544)
             self.guild = self.get_guild(651231834356711427) # !Deprecated
             
+            #TODO: Migrate to DiscordSlashCommands
             DiscordComponents(Bot)
             
             log.info(f'>>> FLANGSBOT READY')
@@ -116,6 +120,7 @@ class Bot(BotBase):
         if not message.author.bot:
             await self.process_commands(message)
 
+    #TODO: Refctor this to be more generic
     async def on_error(self, err, *args, **kwargs):
         if err == "on_command_error":
             await args[0].send(f"Se produjo un error en el comando: {err} \n [0x000100]")
@@ -136,11 +141,8 @@ class Bot(BotBase):
             embd1 = Embed(
                 title="***¡Boo boo!***",
                 url="https://flangscom.herokuapp.com",
-                description="¡No se ha podido detectar el problema!",
+                description="Que cagada hiciste, no se que pasó pero no se que pasó.",
                 color=0xca5624
-            )
-            embd1.add_field(
-                name="Administrador", value='<@!546542419399802884>', inline=True
             )
             embd1.add_field(
                 name=f'Exception Raised', value=f'{exc}', inline=True

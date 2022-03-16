@@ -5,4 +5,4 @@ services:
     container_name: 'Flangsbot_Client'
     build: .
     environment:
-      - FLANGSBOT_KEY=${FLANGSBOT_KEY}
+      - FLANGSBOT_TOKEN=${FLANGSBOT_TOKEN}
