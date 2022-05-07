@@ -1,5 +1,6 @@
 # Overrideable SQL templates
 sql_create_table = "CREATE TABLE %(table)s (%(definition)s)"
+sql_check_table = "SELECT %(name)s FROM sqlite_master WHERE type='table' AND name='%(table)s'"
 sql_rename_table = "ALTER TABLE %(old_table)s RENAME TO %(new_table)s"
 sql_retablespace_table = "ALTER TABLE %(table)s SET TABLESPACE %(new_tablespace)s"
 sql_delete_table = "DROP TABLE %(table)s CASCADE"

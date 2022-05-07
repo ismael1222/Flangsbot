@@ -1,14 +1,11 @@
-import discord
 from discord.ext.commands import command, Cog
 from discord.ext.commands.errors import BadArgument, MissingRequiredArgument
 from discord.member import Member
 from discord.embeds import Embed
-from discord_components import Button, ButtonStyle, Select, SelectOption, component
 
 from aiohttp import request
 from random import choice, random
 
-#TODO: Refactor all of this code
 class Misc(Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -78,27 +75,6 @@ class Misc(Cog):
         embed.set_thumbnail(url=choice(flanes))
         embed.set_footer(text="Creador, te han mencionado.")
         await ctx.send(embed=embed)
-
-    @command(name="test")
-    async def test(self, ctx):
-        await ctx.send(
-            ":gear: **Test**",
-            components = [
-                Select(
-                    placeholder = "Menu de ayuda",
-                    max_values = 2,
-                    options = [
-                        SelectOption(label= "Q&A", value = "https://github.com"),
-                        SelectOption(label= "???", value = "https://youtube.com")
-                    ]
-                )
-            ]
-        )
-        while True:
-            interaction = await self.bot.wait_for("select_option")
-            await interaction.respond(
-                content=f"{','.join(map(lambda x: x.label, interaction.component))} selected!"
-            )
             
 def setup(bot):
     bot.add_cog(Misc(bot))

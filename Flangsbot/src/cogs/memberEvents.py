@@ -5,7 +5,7 @@ from discord.ext.commands import Cog, Bot
 from discord.embeds import Embed
 from discord.member import Member
 
-from Flangsbot.src.db.models.Guild import GuildTable
+from Flangsbot.src.db.models.Guild import TableGuild
 
 class WelcomeActions(Cog):
     def __init__(self, bot):
@@ -18,10 +18,9 @@ class WelcomeActions(Cog):
         conn = await connect('Flangsbot/src/db/database.db')
         guild_id = member.guild.id
 
-        GuildT_ = GuildTable(conn, guild_id)
-
-        result: Dict[str, int] = await GuildT_.select(
-            keys = "welcome_channel_id"
+        result: Dict[str, int] = await TableGuild(conn, guild_id).select_one_where(
+            keys = "welcome_channel_id",
+            checks = {'id' : guild_id}
         )
 
         channel = self.bot.get_channel(
@@ -35,15 +34,16 @@ class WelcomeActions(Cog):
         conn = await connect('Flangsbot/src/db/database.db')
         guild_id = member.guild.id
 
-        result: Dict[str, int] = await GuildTable(conn, guild_id).select(
-            keys = "welcome_channel_id"
+        result: Dict[str, int] = await TableGuild(conn, guild_id).select_one_where(
+            keys = "welcome_channel_id",
+            checks = {'id' : guild_id}
         )
 
         channel = self.bot.get_channel(
             result["welcome_channel_id"]
         )
 
-        await channel.send(f"{member.mention} has left the server.")
+        await channel.send(f'{member.mention} has joined the server!')
 
 def setup(bot):
     bot.add_cog(WelcomeActions(bot))

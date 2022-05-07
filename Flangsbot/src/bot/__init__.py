@@ -7,24 +7,18 @@ from asyncio.tasks import sleep
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
-from cogwatch import watch
-
-from discord import Embed, Intents, Game
+from discord import Embed, Intents
 from discord.ext.commands.context import Context
 from discord.ext.commands import Bot as BotBase
 from discord.errors import Forbidden, HTTPException
-from discord_components import DiscordComponents
 
-from .config import FMT, PREFIX, OWNER_IDS, COGS, IGNORE_EXCEPTIONS, STD_HANDLER
+from .config import FMT, PREFIX, OWNER_IDS, COGS, IGNORE_EXCEPTIONS
 from .helpcommand import Help
 from .preloader import Preload
 from .utils import Configuration
 
-# log = logging.getLogger(__name__)
-# log.addHandler(STD_HANDLER)
-
 log.basicConfig(
-    level=log.INFO,
+    level=log.DEBUG,
     format=FMT
 )
 
@@ -36,8 +30,8 @@ intents.members = True
 class Bot(BotBase):
     def __init__(self):
         self.PREFIX = PREFIX
-        self.ready = False
-        self.scheduler = AsyncIOScheduler()
+        self.ready: bool = False
+        self.scheduler: AsyncIOScheduler = AsyncIOScheduler()
 
         super().__init__(
             command_prefix = PREFIX, 
@@ -55,7 +49,7 @@ class Bot(BotBase):
 
     def run(self, VERSION):
         self.VERSION = VERSION
-        self.TOKEN = os.getenv('FLANGSBOT_TOKEN')
+        self.TOKEN = os.getenv('FLANGSBOT_KEY')
 
         log.info(f'Flangsbot Development Version: {self.VERSION}')
         log.warn(f'!> RUNNING SETUP')
@@ -79,17 +73,13 @@ class Bot(BotBase):
                 #TODO: Fix context void
                 await ctx.send("!- I'm not ready to recive commands. Please wait a few seconds.")
 
-    @watch(path = "Flangsbot/src/cogs/")
     async def on_ready(self):
         if not self.ready:
             self.ready = True
             self.preload = Preload()
             self.ch = self.get_channel(845523083700076544)
             self.guild = self.get_guild(651231834356711427) # !Deprecated
-            
-            #TODO: Migrate to DiscordSlashCommands
-            DiscordComponents(Bot)
-            
+
             log.info(f'>>> FLANGSBOT READY')
 
             embd2=Embed(

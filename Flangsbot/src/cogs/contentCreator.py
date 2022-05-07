@@ -1,7 +1,5 @@
 from discord.ext.commands import Cog, command, cooldown, BucketType
 
-from discord_components import Button, ButtonStyle, Select, SelectOption, component, interaction
-
 class ContentCreator(Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -13,7 +11,7 @@ class ContentCreator(Cog):
             + Roles como "Wumpus" tendran mayor capacidad de crear canales con diferentes temas. (Mayor nivel mas canales disponibles)
         * Tercero. Todos los usuarios sin esepcion ganaran experiencia por participar en los canales, la cual podra ser cangeable por roles prestigiosos.
 
-    TODO: Utilizar DiscordComponents para crear interfaces de usuario.
+    TODO: Migrate to discord-Interactions.
 
 
     FLAN:

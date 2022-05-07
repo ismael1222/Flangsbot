@@ -1,3 +1,3 @@
-from .base import BaseDatabase
+from .base import BaseDatabase, UnsupportedDatabase
 
 Database = BaseDatabase

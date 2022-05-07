@@ -1,9 +1,8 @@
-import discord
-
 from discord.ext.commands import command, cooldown, Cog, BucketType
 from discord.ext.commands import has_guild_permissions, MissingPermissions, MissingRequiredArgument, MissingRole
 from discord.ext.commands.errors import MemberNotFound
 from discord.embeds import Embed
+from discord.member import Member
 
 class Moderation(Cog):
     def __init__(self, bot):
@@ -13,12 +12,11 @@ class Moderation(Cog):
     @cooldown(1, 5, BucketType.user)
     @has_guild_permissions(manage_messages=True)
     async def clear(self, ctx, amount: int):
-        if amount != None:
-            if amount <= 50:
-                await ctx.channel.purge(limit=amount)
-                await ctx.send(f'</ {ctx.message.author.mention} /> Se han eliminado {amount} mensajes', delete_after=3)
-            else:
-                await ctx.send(f'</ {ctx.message.author.mention} /> No puedes eliminar más de 50 mensajes', delete_after=3)
+        if amount <= 50:
+            await ctx.channel.purge(limit=amount)
+            await ctx.send(f'</ {ctx.message.author.mention} /> Se han eliminado {amount} mensajes', delete_after=3)
+        else:
+            await ctx.send(f'</ {ctx.message.author.mention} /> No puedes eliminar más de 50 mensajes', delete_after=3)
             
     @clear.error
     async def clear_error(self, ctx, error):
@@ -31,7 +29,7 @@ class Moderation(Cog):
 
     @command(name="ban")
     @has_guild_permissions(ban_members=True)
-    async def ban(self, ctx, member: discord.Member, *reason: str):
+    async def ban(self, ctx, member: Member, *reason: str):
         await member.ban(reason=reason)
 
         emb = Embed(title=f'~~Cagatse~~', description=f'{member.mention} ha sido baneado por {ctx.author.mention}', color=0xFFC500)
@@ -52,6 +50,6 @@ class Moderation(Cog):
             await ctx.send("!No tienes permisos para usar este comando.")
         if isinstance(err, MissingRole):
             await ctx.send("!No tienes el rol necesario para usar este comando.")
-        
+
 def setup(bot):
     bot.add_cog(Moderation(bot))
