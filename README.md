@@ -24,7 +24,7 @@ En **[Flangscom](https://discord.com/invite/XCNV7x8)** estamos diseñando un bot
     - Filtro contra urls maliciosas.
     - Proteccion contra Nukes.
     - Proteccion contra flood.
-    - Proteccion contra phishign.
+    - Proteccion contra phishing.
 * Diseño y administracion de actividades:
     - Creacion de minijuegos.
     - Creacion de eventos.
